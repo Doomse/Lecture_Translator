@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_headers %}
+    <link href="{% static 'tasks/styles.css' %}" rel=stylesheet>
+{% endblock extra_headers %}
+
+{% block content %}
+    {{ form_html }}
+{% endblock content %}

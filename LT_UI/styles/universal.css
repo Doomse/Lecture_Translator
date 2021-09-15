@@ -1,0 +1,24 @@
+body {
+    max-width: 1080px;
+    margin: 0 auto;
+    margin-top: 20px;
+    background-color: lightslategray;
+    /*background-image: url(../bilder/background/aktuell.jpg);
+    background-attachment: fixed;*/
+    hyphens: auto;
+    font-family: sans-serif;
+}
+
+header h1 {
+    background-color: white;
+    padding-top: 20px;
+    margin: 0;
+    text-align: center;
+    color: blue;
+}
+
+section{
+    margin: 0;
+    padding: 20px;
+    background-color: white;
+}
