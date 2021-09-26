@@ -20,5 +20,5 @@
         <hr>
     {% endfor %}
     <h2>Create new task</h2>
-    {{ form_html }}
+    {% include "tasks/task_inline_form.html" %}
 {% endblock content %}

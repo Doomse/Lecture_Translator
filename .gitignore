@@ -1,4 +1,5 @@
 venv/
+media/
 localsettings.py
 __pycache__/
 migrations/
