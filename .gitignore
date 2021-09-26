@@ -1,2 +1,5 @@
 venv/
 localsettings.py
+__pycache__/
+migrations/
+db.sqlite3
