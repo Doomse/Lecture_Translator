@@ -10,7 +10,10 @@
     <h2>Your tasks</h2>
     {% for task in task_list %}
         <p>
-            <span>{{ task.title }}</span>
+            <span>
+                {{ task.title }}
+                <a href="{% url 'task-edit' task.id%}"><button type="button">Edit</button></a>
+            </span>
             <span class="download">
                 <a href="{% url 'task-detail' task.id %}"><button type="button">Source</button></a>
                 <a href=""><button type="button">Transcript</button></a>

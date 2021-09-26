@@ -25,6 +25,18 @@ class TaskCreateView(mixins.LoginRequiredMixin, generic.CreateView):
     success_url = '/tasks/list/'
     template_name_suffix = '_form_wrapper'
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
+class TaskUpdateView(mixins.LoginRequiredMixin, generic.UpdateView):
+
+    model = models.Task
+    form_class = forms.TaskForm
+    success_url = '/tasks/list/'
+    template_name_suffix = '_form_wrapper'
+
 
 class TaskDetailView(mixins.LoginRequiredMixin, generic.DetailView):
 
