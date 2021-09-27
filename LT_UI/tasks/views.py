@@ -35,10 +35,10 @@ class TaskUpdateView(mixins.LoginRequiredMixin, generic.UpdateView):
     model = models.Task
     form_class = forms.TaskForm
     success_url = '/tasks/list/'
-    template_name_suffix = '_form_wrapper'
+    template_name_suffix = '_update_form'
 
 
-class TaskDetailView(mixins.LoginRequiredMixin, generic.DetailView):
+class TaskDownloadSourceView(mixins.LoginRequiredMixin, generic.DetailView):
 
     model = models.Task
 
@@ -48,3 +48,15 @@ class TaskDetailView(mixins.LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         return http.FileResponse(instance.source.open('rb'), as_attachment=True)
+
+
+class TaskDownloadResultView(mixins.LoginRequiredMixin, generic.DetailView):
+
+    model = models.Task
+
+    def get_object(self, queryset=None):
+        return super().get_object(queryset=models.Task.objects.filter(owner=self.request.user))
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return http.FileResponse(instance.result.open('rb'), as_attachment=True)

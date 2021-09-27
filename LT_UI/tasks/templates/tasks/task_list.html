@@ -15,9 +15,12 @@
                 <a href="{% url 'task-edit' task.id%}"><button type="button">Edit</button></a>
             </span>
             <span class="download">
-                <a href="{% url 'task-detail' task.id %}"><button type="button">Source</button></a>
-                <a href=""><button type="button">Transcript</button></a>
-                <a href=""><button type="button">Translation</button></a>
+                <a href="{% url 'task-download-source' task.id %}"><button type="button">Source</button></a>
+                {% if task.result %}
+                    <a href="{% url 'task-download-result' task.id %}"><button type="button">Result</button></a>
+                {% else %}
+                    <button type="button" disabled>Result</button>
+                {% endif %}
             </span>
         </p>
         <hr>

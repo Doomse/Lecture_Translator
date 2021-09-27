@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_headers %}
+    <link href="{% static 'tasks/styles.css' %}" rel=stylesheet>
+{% endblock extra_headers %}
+
+{% block content %}
+    <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+        <tr>
+            <th></th>
+            <td><input type="submit" value="Update"></td>
+        </tr>
+    </table>
+</form>
+{% endblock content %}
