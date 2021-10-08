@@ -6,5 +6,5 @@ urlpatterns = [
     path('create/', views.TaskCreateView.as_view(), name='task-create'),
     path('download/<int:pk>/source/', views.TaskDownloadSourceView.as_view(), name='task-download-source'),
     path('download/<int:pk>/result/', views.TaskDownloadResultView.as_view(), name='task-download-result'),
-    path('edit/<int:pk>/', views.TaskUpdateView.as_view(), name='task-edit'),
+    path('translations/<int:pk>/', views.TaskTranslationView.as_view(), name='task-translations'),
 ]

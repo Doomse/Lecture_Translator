@@ -7,14 +7,15 @@
 {% endblock extra_headers %}
 
 {% block content %}
+    <h2>Create new task</h2>
     <form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <table>
-        {{ form.as_table }}
-        <tr>
-            <th></th>
-            <td><input type="submit" value="Update"></td>
-        </tr>
-    </table>
-</form>
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+            <tr>
+                <th></th>
+                <td><input type="submit" value="Create"></td>
+            </tr>
+        </table>
+    </form>
 {% endblock content %}

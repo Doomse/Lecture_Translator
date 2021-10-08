@@ -12,7 +12,7 @@
         <p>
             <span>
                 {{ task.title }}
-                <a href="{% url 'task-edit' task.id%}"><button type="button">Edit</button></a>
+                {{ task.get_status_display }}
             </span>
             <span class="download">
                 <a href="{% url 'task-download-source' task.id %}"><button type="button">Source</button></a>
@@ -25,6 +25,6 @@
         </p>
         <hr>
     {% endfor %}
-    <h2>Create new task</h2>
-    {% include "tasks/task_inline_form.html" %}
+    <a href="{% url 'task-create' %}"><button type="button">Create New Task</button></a>
+    <a href="{% url 'logout' %}" id="logout"><button type="button">Logout</button></a>
 {% endblock content %}

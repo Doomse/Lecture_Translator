@@ -18,3 +18,13 @@ span.download {
 form table {
     border-spacing: 5px 10px;
 }
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#logout {
+    float: right;
+}
