@@ -10,8 +10,7 @@ LANGUAGE_CHOICES = [
 ]
 """
 LANGUAGE_CHOICES = [
-    ('de', 'German'),
-    ('en', 'English'),
+    
 ]
 
 
@@ -32,13 +31,7 @@ TRANSLATION_CHOICES = {
 }
 """
 TRANSLATION_CHOICES = {
-    'de': [
-        ('en', 'English'),
-    ],
-    'en': [
-        ('de', 'German'),
-        ('fr', 'French'),
-    ],
+    
 }
 
 
@@ -54,10 +47,7 @@ language is one of the language codes specified in LANGUAGE_CHOICES.
 Expects the result of the ASR process.
 """
 def asr_worker(source: bytes, seperation: str, language: str) -> str:
-    print('asr start')
-    time.sleep(120)
-    print('asr end')
-    return 'transcription'
+    pass
 
 
 """
@@ -73,7 +63,4 @@ Expects the results of all MT processes returned as (language_code, translation)
 They can either be returned as a list or using 'yield' (a generator).
 """
 def mt_worker(text: str, language: str, translations: 'list[str]', source: bytes, seperation: str) -> 'list[tuple[str,str]]':
-    print('mt start')
-    time.sleep(120)
-    print('mt end')
-    return [(code, f'{code} translation',) for code in translations]
+    pass
