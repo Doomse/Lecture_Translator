@@ -12,11 +12,11 @@
         <p>
             <span>
                 {{ task.title }}
-                {{ task.get_status_display }}
+                <span class="{{ task.status|lower }}">{{ task.get_status_display }}</span>
             </span>
             <span class="download">
                 <a href="{% url 'task-download-source' task.id %}"><button type="button">Source</button></a>
-                {% if task.result %}
+                {% if task.status == task.DONE %}
                     <a href="{% url 'task-download-result' task.id %}"><button type="button">Result</button></a>
                 {% else %}
                     <button type="button" disabled>Result</button>

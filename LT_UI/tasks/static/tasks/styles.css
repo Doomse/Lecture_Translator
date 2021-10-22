@@ -14,6 +14,26 @@ span.download {
     text-align: right;
 }
 
+span.crat {
+    color: orange;
+    font-size: small;
+}
+
+span.wait {
+    color: gray;
+    font-size: small;
+}
+
+span.proc {
+    color: blue;
+    font-size: small;
+}
+
+span.done {
+    color: green;
+    font-size: small;
+}
+
 /*affects the create form*/
 form table {
     border-spacing: 5px 10px;
