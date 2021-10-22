@@ -1,1 +1,1 @@
-# LT_UI
+# Lecture Translator Webpage
