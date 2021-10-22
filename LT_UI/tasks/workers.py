@@ -1,5 +1,3 @@
-import time
-
 """
 Specify the list of languages your ASR system supports by filling this list with tuples of code (max 5 chars) and display name.
 
@@ -46,7 +44,7 @@ so if your workers rely on unique resources, you have to take care of synchronis
 Expects the result of the seperation process.
 """
 def sep_worker(source: bytes, language: str) -> str:
-    return 'seperation'
+    pass
 
 
 """
@@ -61,7 +59,7 @@ so if your workers rely on unique resources, you have to take care of synchronis
 Expects the result of the ASR process.
 """
 def asr_worker(source: bytes, seperation: str, language: str) -> str:
-    return 'transcription'
+    pass
 
 
 """
@@ -79,4 +77,4 @@ Expects the results of all MT processes returned as (language_code, translation)
 They can either be returned as a list or using 'yield' (a generator).
 """
 def mt_worker(text: str, language: str, translations: 'list[str]', source: bytes, seperation: str) -> 'list[tuple[str,str]]':
-    return [f'{code} translation' for code in translations]
+    pass
