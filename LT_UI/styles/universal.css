@@ -22,3 +22,7 @@ section{
     padding: 20px;
     background-color: white;
 }
+
+form table {
+    border-spacing: 5px 10px;
+}

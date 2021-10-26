@@ -35,10 +35,6 @@ span.done {
 }
 
 /*affects the create form*/
-form table {
-    border-spacing: 5px 10px;
-}
-
 ul {
     list-style-type: none;
     padding: 0;

@@ -19,7 +19,6 @@ class TaskTranslationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance is not None:
-            print(self.instance)
             self.fields['translations'] = forms.MultipleChoiceField(choices=self.instance.get_translations(), widget=forms.widgets.CheckboxSelectMultiple, required=False)
 
     class Meta:
