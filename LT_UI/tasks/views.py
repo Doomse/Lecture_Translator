@@ -11,10 +11,10 @@ class TaskListView(mixins.LoginRequiredMixin, generic.ListView):
         return models.Task.objects.filter(owner=self.request.user)
 
 
-class TaskCreateView(mixins.LoginRequiredMixin, generic.CreateView):
+class TaskZipCreateView(mixins.LoginRequiredMixin, generic.CreateView):
 
     model = models.Task
-    form_class = forms.TaskForm
+    form_class = forms.TaskZipForm
 
     def get_success_url(self):
         return urls.reverse('task-translations', args=(self.object.id, ))
@@ -22,6 +22,11 @@ class TaskCreateView(mixins.LoginRequiredMixin, generic.CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
+
+
+class TaskFilesCreateView(TaskZipCreateView):
+
+    form_class = forms.TaskFilesForm
 
 
 class TaskTranslationView(mixins.LoginRequiredMixin, generic.UpdateView):

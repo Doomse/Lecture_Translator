@@ -7,7 +7,7 @@ import threading
 
 
 def source_path(instance, filename):
-    return instance.owner.username + '/' + filename
+    return instance.owner.username + f'/source_{instance.title}.zip'
 
 def result_path(instance, filename):
     return instance.owner.username + f'/result_{instance.title}.zip'
