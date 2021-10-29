@@ -12,6 +12,9 @@ def source_path(instance, filename):
 def result_path(instance, filename):
     return instance.owner.username + f'/result_{instance.title}.zip'
 
+def log_path(instance, filename):
+    return instance.owner.username + f'/log_{instance.title}.zip'
+
 
 class ListField(models.CharField):
     """
@@ -53,15 +56,19 @@ class Task(models.Model):
 
     title = models.CharField(max_length=200)
     owner = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE, related_name='tasks')
-    source = models.FileField(upload_to=source_path)
-    result = models.FileField(upload_to=result_path)
+
     language = models.CharField(choices=workers.LANGUAGE_CHOICES, max_length=5, default=None)
     translations = ListField(max_length=100, blank=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=4, default=CREATE)
 
+    source = models.FileField(upload_to=source_path)
+    result = models.FileField(upload_to=result_path)
+    log = models.FileField(upload_to=log_path)
+
     def save(self, *args, **kwargs):
         if self._state.adding:
             self.result.save('name', base.ContentFile(b''), save=False)
+            self.log.save('name', base.ContentFile(b''), save=False)
         super().save(*args, **kwargs)
         if self.status == self.WAIT:
             t = threading.Thread(target=utils.run_workers, kwargs={'task': self})

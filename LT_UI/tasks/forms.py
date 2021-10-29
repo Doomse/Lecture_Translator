@@ -26,9 +26,6 @@ class TaskFilesForm(TaskZipForm):
         with zipfile.ZipFile(data, 'w') as zf:
             for file in self.files.getlist('source'):
                 zf.writestr(file.name, file.read())
-        print(self.files['source'])
-        print(self.cleaned_data['source'])
-        print(data)
         return data
 
     class Meta(TaskZipForm.Meta):
