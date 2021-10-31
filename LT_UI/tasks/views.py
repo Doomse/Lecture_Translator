@@ -64,3 +64,15 @@ class TaskDownloadResultView(mixins.LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         return http.FileResponse(instance.result.open('rb'), as_attachment=True)
+
+
+class TaskDownloadLogView(mixins.LoginRequiredMixin, generic.DetailView):
+
+    model = models.Task
+
+    def get_object(self, queryset=None):
+        return super().get_object(queryset=models.Task.objects.filter(owner=self.request.user))
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return http.FileResponse(instance.log.open('rb'), as_attachment=True)

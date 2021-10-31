@@ -7,5 +7,6 @@ urlpatterns = [
     path('create/files/', views.TaskFilesCreateView.as_view(), name='task-create-files'),
     path('download/<int:pk>/source/', views.TaskDownloadSourceView.as_view(), name='task-download-source'),
     path('download/<int:pk>/result/', views.TaskDownloadResultView.as_view(), name='task-download-result'),
+    path('download/<int:pk>/log/', views.TaskDownloadLogView.as_view(), name='task-download-log'),
     path('translations/<int:pk>/', views.TaskTranslationView.as_view(), name='task-translations'),
 ]

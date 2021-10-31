@@ -18,8 +18,10 @@
                 <a href="{% url 'task-download-source' task.id %}"><button type="button">Source</button></a>
                 {% if task.status == task.DONE %}
                     <a href="{% url 'task-download-result' task.id %}"><button type="button">Result</button></a>
+                    <a href="{% url 'task-download-log' task.id %}"><button type="button">Log</button></a>
                 {% else %}
                     <button type="button" disabled>Result</button>
+                    <button type="button" disabled>Log</button>
                 {% endif %}
             </span>
         </p>

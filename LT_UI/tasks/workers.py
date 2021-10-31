@@ -1,3 +1,5 @@
+import time
+
 """
 Specify the list of languages your ASR system supports by filling this list with tuples of code (max 5 chars) and display name.
 
@@ -8,7 +10,7 @@ LANGUAGE_CHOICES = [
 ]
 """
 LANGUAGE_CHOICES = [
-    
+
 ]
 
 
@@ -29,22 +31,8 @@ TRANSLATION_CHOICES = {
 }
 """
 TRANSLATION_CHOICES = {
-    
+
 }
-
-
-"""
-Implement your seperation worker interface in this function.
-Please note that this functions is potentially called in parallel,
-so if your workers rely on unique resources, you have to take care of synchronisation.
-
-'source' is the content of the uploaded file.
-'language' is one of the language codes specified in LANGUAGE_CHOICES.
-
-Expects the result of the seperation process.
-"""
-def sep_worker(source: bytes, language: str) -> str:
-    pass
 
 
 """
@@ -53,12 +41,14 @@ Please note that this functions is potentially called in parallel,
 so if your workers rely on unique resources, you have to take care of synchronisation.
 
 'source' is the content of the uploaded file.
-'seperation' is the content of the seperation file.
+'segmentation' is the content of the segmentation file.
 'language' is one of the language codes specified in LANGUAGE_CHOICES.
 
-Expects the result of the ASR process.
+Expects the result of the ASR process as (transcript, logging).
+If there is any additional data/information, that you wish to pass to the mt processes, you can append them to the return tuple.
+These will be passed as additional positional arguments to the mt worker function.
 """
-def asr_worker(source: bytes, seperation: str, language: str) -> str:
+def asr_worker(source: bytes, segmentation: str, language: str) -> 'tuple[str]':
     pass
 
 
@@ -70,11 +60,10 @@ so if your workers rely on unique resources, you have to take care of synchronis
 'text' is the result of the ASR worker.
 'language' is one of the language codes specified in LANGUAGE_CHOICES.
 'translations' is a list of language codes specified in TRANSLATION_CHOICES.
-'source' is the content of the uploaded file.
-'seperation' is the content of the seperation file.
+'args' is a list of the additional data/information returned by the asr process
 
-Expects the results of all MT processes returned as (language_code, translation) tuples.
+Expects the results of all MT processes returned as (language_code, translation, logging) tuples.
 They can either be returned as a list or using 'yield' (a generator).
 """
-def mt_worker(text: str, language: str, translations: 'list[str]', source: bytes, seperation: str) -> 'list[tuple[str,str]]':
+def mt_worker(text: str, language: str, translations: 'list[str]', *args) -> 'list[tuple[str,str]]':
     pass

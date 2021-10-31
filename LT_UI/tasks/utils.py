@@ -105,8 +105,8 @@ def run_workers(task):
 
                     #Segmentation
                     segmentation, log = segment_audio(audio, folder)
-                    res_zip.writestr(f'{folder}/seperation.txt', segmentation)
-                    res_zip.writestr(f'seperation/{folder}.txt', segmentation)
+                    res_zip.writestr(f'{folder}/segmentation.txt', segmentation)
+                    res_zip.writestr(f'segmentation/{folder}.txt', segmentation)
                     log_zip.writestr(f'{folder}/segment_audio.log', log)
                     print('Segmentation done')
 
