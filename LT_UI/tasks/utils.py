@@ -1,6 +1,7 @@
 from . import workers
 import zipfile, os, tempfile, subprocess, re, traceback
-
+import operator
+from datetime import timedelta
 
 def convert_to_wav(source, ext):
 
@@ -78,8 +79,81 @@ def text_to_vtt(text, lang):
 
     return (p.stdout, p.stderr, )
 
+def stm_to_vtt_time(time):
+    time_orig = float(time)
+    time = str(timedelta(seconds=time_orig))
+    time = "0" +time
+    split_ms = time.split('.')
+    if len(split_ms) < 2:
+        time = time + ".000"
+    else:
+        time = round(float("0."+split_ms[1]), 3)
+        time = split_ms[0] + str(time)[1:]
+        split_ms = time.split('.')
+        ms_len =  len(split_ms[1])
+        if ms_len <= 3:
+            time = time + "0"*(3-ms_len)
+    return time
+
+def set_to_vtt(text):
+    result = "WEBVTT \n\n"
+    for line in text.split('\n'):
+        line = line.strip()     
+        if len(line) < 2:
+            print("line to short: {}".format(line))
+            continue   
+        print(line)
+        tokens = line.split()       
+        start, end = tokens[0], tokens[1]
+        hypo = ' '.join(tokens[2:])
+        start = stm_to_vtt_time(start)
+        end = stm_to_vtt_time(end)
+        result += "{} --> {} \n".format(start, end)
+        result += hypo + "\n\n"
+
+    return result, "None"
 
 
+def seg_to_stm(seg):
+    dic = {}
+    dic2 = {}
+    for line in seg.splitlines():
+        tokens = line.split()
+        if "." not in tokens[2]:
+            tokens[2] = tokens[2] + ".00"
+        if "." not in tokens[3]:
+            tokens[3] = tokens[3] + ".00"
+        start_sec, start_ms = tokens[2].split('.')
+        start_ms = start_ms + '0' * (2-len(start_ms.strip()))
+        start = start_sec + start_ms
+        if len(start) < 7:
+            rest = 7-len(start)
+            rest_s = "0"*rest
+            start = rest_s + start
+        end_sec, end_ms = tokens[3].split('.')
+        end_ms = end_ms + '0' * (2-len(end_ms.strip()))
+        end = end_sec + end_ms
+        if len(end) < 7:
+            rest = 7-len(end)
+            rest_s = "0"*rest
+            end = rest_s + end
+        utt_id = tokens[0]+"_"+start+"_"+end
+        dic[utt_id] = float(tokens[2])
+        dic2[utt_id] = (tokens[1], tokens[2], tokens[3])
+
+    sorted_dicdata = sorted(dic.items(), key=operator.itemgetter(1))
+    result=""
+    for tpl in sorted_dicdata:
+        lst = dic2[tpl[0]]
+        start_sec, start_ms = lst[1].split('.')
+        start = start_sec + "." + start_ms + '0' * (2-len(start_ms))
+        end_sec, end_ms = lst[2].split('.')
+        end = end_sec + "." + end_ms + '0' * (2-len(end_ms))
+        str_ = "{} {} {}".format(lst[0], start, end)            
+        out = tpl[0] + " "+ str_
+        result += out + "\n"  
+
+    return result
 
 def run_workers(task):
 
@@ -103,12 +177,17 @@ def run_workers(task):
                     log_zip.writestr(f'{folder}/convert_audio.log', log)
                     print('Conversion done')
 
+
+
                     #Segmentation
                     segmentation, log = segment_audio(audio, folder)
                     res_zip.writestr(f'{folder}/segmentation.txt', segmentation)
                     res_zip.writestr(f'segmentation/{folder}.txt', segmentation)
                     log_zip.writestr(f'{folder}/segment_audio.log', log)
                     print('Segmentation done')
+                    segmentation = seg_to_stm(segmentation)
+                    res_zip.writestr(f'segmentation/{folder}.stm', segmentation)
+                    print('STM DONE')
 
                     #ASR
                     text, log, *additional = workers.asr_worker(audio, segmentation, task.language)
@@ -117,9 +196,10 @@ def run_workers(task):
                     log_zip.writestr(f'{folder}/transcribe_audio.log', log)
                     print('ASR done')
 
-                    #ToVtt
+                    1#ToVtt
                     try:
-                        vtt, log = text_to_vtt(text, task.language)
+                        #vtt, log = text_to_vtt(text, task.language)
+                        vtt, log = set_to_vtt(text)
                         res_zip.writestr(f'{folder}/transcript.vtt', vtt)
                         res_zip.writestr(f'transcript/{folder}.vtt', vtt)
                         log_zip.writestr(f'{folder}/text_to_vtt.log', log)
