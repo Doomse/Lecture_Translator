@@ -1,7 +1,7 @@
 from . import workers
 import zipfile, os, tempfile, subprocess, re, traceback
 import operator
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 def convert_to_wav(source, ext):
 
@@ -45,89 +45,32 @@ def format_seg_as_stm(segmentation):
     return ''.join(result)
 
 
-def text_to_vtt(text, lang):
-
-    phrase = []
-    vtt = f'WEBVTT Kind: captions; Language: {lang}\n\n'
-
-    for line in text.split('\n'):
-
-        #TODO maybe skip empty lines
-
-        start, dur, word = line.split(' ')
-
-        if not phrase:
-            secondsFrom = float(start)
-        phrase += [word]
-        if re.match(r'[,\.\?\!]', word[-1]):
-            secondsTo = float(start) + float(dur)
-
-            hoursFrom=int(secondsFrom//60//60)
-            minutesFrom=int((secondsFrom - 60*60*hoursFrom)//60)
-            secondsFrom=secondsFrom - hoursFrom*60*60 - minutesFrom*60.0
-
-            hoursTo=int(secondsTo//60//60)
-            minutesTo=int((secondsTo - 60*60*hoursTo)//60)
-            secondsTo=secondsTo - hoursFrom*60*60 - minutesTo*60.0
-
-            vtt += f'{hoursFrom:02d}:{minutesFrom:02d}:{secondsFrom:06.3f} --> {hoursTo:02d}:{minutesTo:02d}:{secondsTo:06.3f}\n'
-            vtt += ' '.join(phrase) + '\n\n'
-            phrase = []
-
-    #Roll out once to handle last phrase regardless of ending
-    secondsTo = float(start) + float(dur)
-
-    hoursFrom=int(secondsFrom//60//60)
-    minutesFrom=int((secondsFrom - 60*60*hoursFrom)//60)
-    secondsFrom=secondsFrom - hoursFrom*60*60 - minutesFrom*60.0
-
-    hoursTo=int(secondsTo//60//60)
-    minutesTo=int((secondsTo - 60*60*hoursTo)//60)
-    secondsTo=secondsTo - hoursFrom*60*60 - minutesTo*60.0
-
-    vtt += f'{hoursFrom:02d}:{minutesFrom:02d}:{secondsFrom:06.3f} --> {hoursTo:02d}:{minutesTo:02d}:{secondsTo:06.3f}\n'
-    vtt += ' '.join(phrase) + '\n\n'
-
-    #Edit file using sed
-    command = ['sed', '-e', '"s/<unk>//g"', '-e', '"s/\s\+/ /g"', '-e', '"s/^\s*//g"']
-    p = subprocess.run(command, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p.stdin.write(vtt)
-
-    return (p.stdout, p.stderr, )
-
 def stm_to_vtt_time(time):
-    time_orig = float(time)
-    time = str(timedelta(seconds=time_orig))
-    time = "0" +time
-    split_ms = time.split('.')
-    if len(split_ms) < 2:
-        time = time + ".000"
-    else:
-        time = round(float("0."+split_ms[1]), 3)
-        time = split_ms[0] + str(time)[1:]
-        split_ms = time.split('.')
-        ms_len =  len(split_ms[1])
-        if ms_len <= 3:
-            time = time + "0"*(3-ms_len)
-    return time
+    td = timedelta( seconds=round(float(time), 3) )
+    #dummy date, important is the time 00:00:00.000000
+    time = datetime(1970, 1, 1)
+    #we need the datetime, since time + timedelta isn't supported
+    time += td
+    time = time.time()
+    return time.isoformat('milliseconds')
 
 def set_to_vtt(text):
     result = "WEBVTT \n\n"
-    for line in text.split('\n'):
+    log = ""
+    for line in text.splitlines():
         line = line.strip()     
-        if len(line) < 2:
-            print("line to short: {}".format(line))
-            continue   
-        print(line)
-        tokens = line.split()       
-        start, end = tokens[0], tokens[1]
-        hypo = ' '.join(tokens[2:])
+        try:
+            start, end, *hypo = line.split()
+        except ValueError:
+            log += f'badly formatted line {line}'
+            continue
+        hypo = ' '.join(hypo)
         start = stm_to_vtt_time(start)
         end = stm_to_vtt_time(end)
-        result += "{} --> {} \n".format(start, end)
+        result += f"{start} --> {end} \n"
         result += hypo + "\n\n"
 
-    return result, "None"
+    return result, log
 
 
 def run_workers(task):
@@ -174,9 +117,8 @@ def run_workers(task):
                     log_zip.writestr(f'{folder}/transcribe_audio.log', log)
                     print('ASR done')
 
-                    1#ToVtt
+                    #ToVtt
                     try:
-                        #vtt, log = text_to_vtt(text, task.language)
                         vtt, log = set_to_vtt(text)
                         res_zip.writestr(f'{folder}/transcript.vtt', vtt)
                         res_zip.writestr(f'transcript/{folder}.vtt', vtt)
