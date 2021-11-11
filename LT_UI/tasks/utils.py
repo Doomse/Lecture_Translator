@@ -28,6 +28,22 @@ def segment_audio(audio, name):
 
         return (resultfile.read(), '---STDOUT---\n' + p.stdout + '\n---STDERR---\n' + p.stderr, )
 
+def format_seg_as_stm(segmentation):
+
+    #TODO is sorting really necessary or is seg already in order
+
+
+    dic = {}
+    for line in segmentation.splitlines():
+        name0, name1, start_str, end_str = line.split()
+        start = float(start_str)
+        end = float(end_str)
+        dic[start] = f'{name0}_{int(start*100):07}_{int(end*100):07} {name1} {start:.2f} {end:.2f}\n'
+    
+    result = [ line for _, line in sorted(dic.items()) ]
+
+    return ''.join(result)
+
 
 def text_to_vtt(text, lang):
 
@@ -114,47 +130,6 @@ def set_to_vtt(text):
     return result, "None"
 
 
-def seg_to_stm(seg):
-    dic = {}
-    dic2 = {}
-    for line in seg.splitlines():
-        tokens = line.split()
-        if "." not in tokens[2]:
-            tokens[2] = tokens[2] + ".00"
-        if "." not in tokens[3]:
-            tokens[3] = tokens[3] + ".00"
-        start_sec, start_ms = tokens[2].split('.')
-        start_ms = start_ms + '0' * (2-len(start_ms.strip()))
-        start = start_sec + start_ms
-        if len(start) < 7:
-            rest = 7-len(start)
-            rest_s = "0"*rest
-            start = rest_s + start
-        end_sec, end_ms = tokens[3].split('.')
-        end_ms = end_ms + '0' * (2-len(end_ms.strip()))
-        end = end_sec + end_ms
-        if len(end) < 7:
-            rest = 7-len(end)
-            rest_s = "0"*rest
-            end = rest_s + end
-        utt_id = tokens[0]+"_"+start+"_"+end
-        dic[utt_id] = float(tokens[2])
-        dic2[utt_id] = (tokens[1], tokens[2], tokens[3])
-
-    sorted_dicdata = sorted(dic.items(), key=operator.itemgetter(1))
-    result=""
-    for tpl in sorted_dicdata:
-        lst = dic2[tpl[0]]
-        start_sec, start_ms = lst[1].split('.')
-        start = start_sec + "." + start_ms + '0' * (2-len(start_ms))
-        end_sec, end_ms = lst[2].split('.')
-        end = end_sec + "." + end_ms + '0' * (2-len(end_ms))
-        str_ = "{} {} {}".format(lst[0], start, end)            
-        out = tpl[0] + " "+ str_
-        result += out + "\n"  
-
-    return result
-
 def run_workers(task):
 
     task.status = task.PROCESSING
@@ -185,9 +160,12 @@ def run_workers(task):
                     res_zip.writestr(f'segmentation/{folder}.txt', segmentation)
                     log_zip.writestr(f'{folder}/segment_audio.log', log)
                     print('Segmentation done')
-                    segmentation = seg_to_stm(segmentation)
+
+                    #ToSTM
+                    segmentation = format_seg_as_stm(segmentation)
                     res_zip.writestr(f'segmentation/{folder}.stm', segmentation)
-                    print('STM DONE')
+                    res_zip.writestr(f'{folder}/segmentation.stm', segmentation)
+                    print('STM Done')
 
                     #ASR
                     text, log, *additional = workers.asr_worker(audio, segmentation, task.language)
