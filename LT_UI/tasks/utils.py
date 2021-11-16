@@ -91,29 +91,23 @@ def run_workers(task):
                     #Convert
                     audio, log = convert_to_wav(source, ext)
                     res_zip.writestr(f'{folder}/audio.wav', audio)
-                    res_zip.writestr(f'audio/{folder}.wav', audio)
                     log_zip.writestr(f'{folder}/convert_audio.log', log)
                     print('Conversion done')
-
-
 
                     #Segmentation
                     segmentation, log = segment_audio(audio, folder)
                     res_zip.writestr(f'{folder}/segmentation.txt', segmentation)
-                    res_zip.writestr(f'segmentation/{folder}.txt', segmentation)
                     log_zip.writestr(f'{folder}/segment_audio.log', log)
                     print('Segmentation done')
 
                     #ToSTM
                     segmentation = format_seg_as_stm(segmentation)
-                    res_zip.writestr(f'segmentation/{folder}.stm', segmentation)
                     res_zip.writestr(f'{folder}/segmentation.stm', segmentation)
                     print('STM Done')
 
                     #ASR
                     text, log, *additional = workers.asr_worker(audio, segmentation, task.language)
                     res_zip.writestr(f'{folder}/transcript.txt', text)
-                    res_zip.writestr(f'transcript/{folder}.txt', text)
                     log_zip.writestr(f'{folder}/transcribe_audio.log', log)
                     print('ASR done')
 
@@ -121,7 +115,6 @@ def run_workers(task):
                     try:
                         vtt, log = set_to_vtt(text)
                         res_zip.writestr(f'{folder}/transcript.vtt', vtt)
-                        res_zip.writestr(f'transcript/{folder}.vtt', vtt)
                         log_zip.writestr(f'{folder}/text_to_vtt.log', log)
                     except Exception:
                         log_zip.writestr(f'{folder}/text_to_vtt.log', traceback.format_exc())
@@ -131,7 +124,6 @@ def run_workers(task):
                     if task.translations:
                         for code, translation, log in workers.mt_worker(text, task.language, task.translations, source, segmentation, *additional):
                             res_zip.writestr(f'{folder}/translation_{code}.txt', translation)
-                            res_zip.writestr(f'translation_{code}/{folder}.txt', translation)
                             log_zip.writestr(f'{folder}/translate_to_{code}.log', log)
                     print('MT done')
 
