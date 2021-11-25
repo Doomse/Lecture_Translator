@@ -3,8 +3,6 @@ body {
     margin: 0 auto;
     margin-top: 20px;
     background-color: lightslategray;
-    /*background-image: url(../bilder/background/aktuell.jpg);
-    background-attachment: fixed;*/
     hyphens: auto;
     font-family: sans-serif;
 }

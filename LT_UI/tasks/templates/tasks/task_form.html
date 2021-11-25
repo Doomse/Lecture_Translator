@@ -8,14 +8,15 @@
 
 {% block content %}
     <h2>Create new task</h2>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" id="post-form">
         {% csrf_token %}
         <table>
             {{ form.as_table }}
             <tr>
                 <th></th>
-                <td><input type="submit" value="Create"></td>
+                <td><input type="submit" value="Create" id="submit-button"></td>
             </tr>
         </table>
     </form>
+    <script src="{% static 'loading_bouncer.js' %}"></script>
 {% endblock content %}

@@ -11,7 +11,11 @@
     {% for task in task_list %}
         <p>
             <span>
-                {{ task.title }}
+                {% if task.status == task.CREATE %}
+                    <a href="{% url 'task-translations' task.id %}">{{ task.title }}</a>
+                {% else %}
+                    {{ task.title }}
+                {% endif %}
                 <span class="{{ task.status|lower }}">{{ task.get_status_display }}</span>
             </span>
             <span class="download">
