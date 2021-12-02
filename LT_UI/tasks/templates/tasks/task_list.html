@@ -7,6 +7,11 @@
 {% endblock extra_headers %}
 
 {% block content %}
+    <div id="logout">Currently logged in as {{ user.get_username }} <a href="{% url 'cas_ng_logout' %}"><button type="button">Logout</button></a></div>
+    <h2>Create New Task</h2>
+    <a href="{% url 'task-create-zip' %}"><button type="button">From Zip Archive</button></a>
+    <a href="{% url 'task-create-files' %}"><button type="button">From File List</button></a>
+    <hr>
     <h2>Your Tasks</h2>
     {% for task in task_list %}
         <p>
@@ -34,5 +39,4 @@
     <h2>Create New Task</h2>
     <a href="{% url 'task-create-zip' %}"><button type="button">From Zip Archive</button></a>
     <a href="{% url 'task-create-files' %}"><button type="button">From File List</button></a>
-    <a href="{% url 'logout' %}" id="logout"><button type="button">Logout</button></a>
 {% endblock content %}
