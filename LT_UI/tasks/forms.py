@@ -1,7 +1,6 @@
 from django import forms
-from django.forms import fields
 from django.core.files import uploadedfile
-from . import models, utils
+from . import models
 import zipfile
 
 
