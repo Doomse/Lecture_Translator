@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+    <h2>Verify access</h2>
+    <form method="POST" enctype="multipart/form-data" id="post-form">
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+            <tr>
+                <th></th>
+                <td><input type="submit" value="Verify" id="submit-button"></td>
+            </tr>
+        </table>
+    </form>
+{% endblock content %}

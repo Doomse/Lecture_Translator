@@ -1,17 +1,27 @@
-from django import forms, http, urls
+from django import http, urls
 from django.views import generic
 from django.contrib.auth import mixins
 from . import models, forms
 
 
+class VerifiedMixin(mixins.UserPassesTestMixin):
 
-class TaskListView(mixins.LoginRequiredMixin, generic.ListView):
+    def test_func(self):
+        return self.request.user.verified
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return http.HttpResponseRedirect(urls.reverse('verify'))
+        return super().handle_no_permission()
+
+
+class TaskListView(VerifiedMixin, generic.ListView):
 
     def get_queryset(self):
         return models.Task.objects.filter(owner=self.request.user)
 
 
-class TaskZipCreateView(mixins.LoginRequiredMixin, generic.CreateView):
+class TaskZipCreateView(VerifiedMixin, generic.CreateView):
 
     model = models.Task
     form_class = forms.TaskZipForm
@@ -29,7 +39,7 @@ class TaskFilesCreateView(TaskZipCreateView):
     form_class = forms.TaskFilesForm
 
 
-class TaskTranslationView(mixins.LoginRequiredMixin, generic.UpdateView):
+class TaskTranslationView(VerifiedMixin, generic.UpdateView):
 
     model = models.Task
     form_class = forms.TaskTranslationForm
@@ -42,7 +52,7 @@ class TaskTranslationView(mixins.LoginRequiredMixin, generic.UpdateView):
         return super().form_valid(form)
 
 
-class TaskDownloadSourceView(mixins.LoginRequiredMixin, generic.DetailView):
+class TaskDownloadSourceView(VerifiedMixin, generic.DetailView):
 
     model = models.Task
 
@@ -54,7 +64,7 @@ class TaskDownloadSourceView(mixins.LoginRequiredMixin, generic.DetailView):
         return http.FileResponse(instance.source.open('rb'), as_attachment=True)
 
 
-class TaskDownloadResultView(mixins.LoginRequiredMixin, generic.DetailView):
+class TaskDownloadResultView(VerifiedMixin, generic.DetailView):
 
     model = models.Task
 
@@ -66,7 +76,7 @@ class TaskDownloadResultView(mixins.LoginRequiredMixin, generic.DetailView):
         return http.FileResponse(instance.result.open('rb'), as_attachment=True)
 
 
-class TaskDownloadLogView(mixins.LoginRequiredMixin, generic.DetailView):
+class TaskDownloadLogView(VerifiedMixin, generic.DetailView):
 
     model = models.Task
 

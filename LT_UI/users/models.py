@@ -25,9 +25,7 @@ class Code(models.Model):
 
     def save(self, *args, **kwargs):
         if self._state.adding:
-            print(self.code)
             self.code = hashers.make_password(self.code)
-            print(self.code)
         return super().save(*args, **kwargs)
 
     def check_code(self, code):
