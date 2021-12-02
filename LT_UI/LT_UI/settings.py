@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_cas_ng',
 ]
 
 MIDDLEWARE = [
@@ -43,6 +44,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_cas_ng.middleware.CASMiddleware',
 ]
 
 ROOT_URLCONF = 'LT_UI.urls'
@@ -119,9 +121,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-LOGIN_URL = reverse_lazy('login')
-LOGIN_REDIRECT_URL = reverse_lazy('task-list')
-LOGOUT_REDIRECT_URL = LOGIN_URL
+LOGIN_URL = reverse_lazy('cas_ng_login')
+
+AUTHENTICATION_BACKENDS = [
+    'django_cas_ng.backends.CASBackend',
+]
+
+CAS_REDIRECT_URL = reverse_lazy('task-list')
+
+CAS_VERSION = '3'
+
+CAS_APPLY_ATTRIBUTES_TO_USER = True
+
+CAS_LOGIN_MSG = None
+
+CAS_LOGGED_MSG = None
 
 
+#Leave this as far down in this file as possible. Only settings that rely on definitions in the localsettings file should go below this import
 from .localsettings import *
