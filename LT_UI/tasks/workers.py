@@ -10,7 +10,8 @@ LANGUAGE_CHOICES = [
 ]
 """
 LANGUAGE_CHOICES = [
-
+    ('de', 'German'),
+    ('en', 'English'),
 ]
 
 
@@ -31,7 +32,13 @@ TRANSLATION_CHOICES = {
 }
 """
 TRANSLATION_CHOICES = {
-
+    'de': [
+        ('en', 'English'),
+    ],
+    'en': [
+        ('de', 'German'),
+        ('fr', 'French'),
+    ],
 }
 
 
@@ -47,6 +54,10 @@ so if your workers rely on unique resources, you have to take care of synchronis
 Expects the result of the ASR process as (transcript, logging).
 If there is any additional data/information, that you wish to pass to the mt processes, you can append them to the return tuple.
 These will be passed as additional positional arguments to the mt worker function.
+
+Example function body for experimental local setups without access to the actual workers:
+    transcript = "0.34 4.32 Hello everyone in this room.\n4.78 6.03 Running is a great sport."
+    return transcript, "random logs"
 """
 def asr_worker(source: bytes, segmentation: str, language: str) -> 'tuple[str]':
     pass
@@ -64,6 +75,9 @@ so if your workers rely on unique resources, you have to take care of synchronis
 
 Expects the results of all MT processes returned as (language_code, translation, logging) tuples.
 They can either be returned as a list or using 'yield' (a generator).
+
+Example function body for experimental local setups without access to the actual workers:
+    return [(code, f'translation_to_{code}', 'logging') for code in translations]
 """
 def mt_worker(text: str, language: str, translations: 'list[str]', *args) -> 'list[tuple[str,str]]':
     pass

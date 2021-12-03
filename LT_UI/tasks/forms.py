@@ -1,5 +1,7 @@
+from pathlib import Path
 from django import forms
 from django.core.files import uploadedfile
+from django.core.files.base import ContentFile
 from . import models
 import zipfile
 
@@ -7,6 +9,7 @@ import zipfile
 class TaskZipForm(forms.ModelForm):
     
     #translations = forms.MultipleChoiceField(choices=utils.LANGUAGE_CHOICES, widget=forms.widgets.CheckboxSelectMultiple)
+    source = forms.FileField()
 
     class Meta:
         model = models.Task
@@ -17,19 +20,27 @@ class TaskZipForm(forms.ModelForm):
         }
 
 
-class TaskFilesForm(TaskZipForm):
+class TaskFilesForm(forms.ModelForm):
 
-    #Rearrange the file list into a single zip archive
-    def clean_source(self):
-        data = uploadedfile.SimpleUploadedFile('name', b'')
-        with zipfile.ZipFile(data, 'w') as zf:
-            for file in self.files.getlist('source'):
-                zf.writestr(file.name, file.read())
-        return data
+    source = forms.FileField(widget=forms.FileInput(attrs={'multiple': True, 'accept': 'audio/*,video/*'}))
+    
+    def save(self, commit=True):
+        # TODO check for duplicate file names
+        print(self.cleaned_data)
+        obj = super().save(commit)
+        for file in self.files.getlist('source'):
+            print(type(file))
+            st = models.SubTask(title=Path(file.name).stem, task=obj)
+            st.source.save(file.name, ContentFile(file.read()))
 
-    class Meta(TaskZipForm.Meta):
-        widgets = TaskZipForm.Meta.widgets
-        widgets['source'] = forms.FileInput(attrs={'multiple': True, 'accept': 'audio/*,video/*'})
+        return obj
+
+    class Meta:
+        model = models.Task
+        fields = ("title", "source", "language")
+        widgets = {
+            'language': forms.RadioSelect,
+        }
 
 
 class TaskTranslationForm(forms.ModelForm):
