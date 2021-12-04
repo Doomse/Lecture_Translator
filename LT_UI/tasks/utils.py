@@ -79,60 +79,67 @@ def run_workers(task):
     task.status = task.PROCESSING
     task.save()
 
-    for subtask in task.subtask.all():
+    with task.edit_resources.open('wb') as full_file:
+        with zipfile.ZipFile(full_file, 'w') as full_zip:
+
+            for subtask in task.subtask.all():
 
 
-        #TODO reading the whole file to pass it to workers might cause memory issues
-        with subtask.source.open('rb') as src_file, subtask.result.open('wb') as res_file, subtask.log.open('wb') as log_file:
-            with zipfile.ZipFile(res_file, 'w') as res_zip, zipfile.ZipFile(log_file, 'w') as log_zip:
+                #TODO reading the whole file to pass it to workers might cause memory issues
+                with subtask.source.open('rb') as src_file, subtask.result.open('wb') as res_file, subtask.log.open('wb') as log_file:
+                    with zipfile.ZipFile(res_file, 'w') as res_zip, zipfile.ZipFile(log_file, 'w') as log_zip:
 
-                try:
+                        try:
 
-                    source = src_file.read()
-                    ext = Path(src_file.name).suffix
-                    name = Path(src_file.name).stem
+                            source = src_file.read()
+                            ext = Path(src_file.name).suffix
+                            name = Path(src_file.name).stem
 
-                    #Convert
-                    audio, log = convert_to_wav(source, ext)
-                    res_zip.writestr('audio.wav', audio)
-                    log_zip.writestr('convert_audio.log', log)
-                    print('Conversion done')
+                            full_zip.writestr(f'{subtask.title}/source{ext}', source)
 
-                    #Segmentation
-                    segmentation, log = segment_audio(audio, name)
-                    res_zip.writestr('segmentation.txt', segmentation)
-                    log_zip.writestr('segment_audio.log', log)
-                    print('Segmentation done')
+                            #Convert
+                            audio, log = convert_to_wav(source, ext)
+                            res_zip.writestr('audio.wav', audio)
+                            log_zip.writestr('convert_audio.log', log)
+                            print('Conversion done')
 
-                    #ToSTM
-                    segmentation = format_seg_as_stm(segmentation)
-                    res_zip.writestr('segmentation.stm', segmentation)
-                    print('STM Done')
+                            #Segmentation
+                            segmentation, log = segment_audio(audio, name)
+                            res_zip.writestr('segmentation.txt', segmentation)
+                            log_zip.writestr('segment_audio.log', log)
+                            print('Segmentation done')
 
-                    #ASR
-                    text, log, *additional = workers.asr_worker(audio, segmentation, task.language)
-                    res_zip.writestr('transcript.txt', text)
-                    log_zip.writestr('transcribe_audio.log', log)
-                    print('ASR done')
+                            #ToSTM
+                            segmentation = format_seg_as_stm(segmentation)
+                            res_zip.writestr('segmentation.stm', segmentation)
+                            print('STM Done')
 
-                    #ToVtt
-                    try:
-                        vtt, log = set_to_vtt(text, subtask)
-                        res_zip.writestr('transcript.vtt', vtt)
-                        log_zip.writestr('text_to_vtt.log', log)
-                    except Exception:
-                        log_zip.writestr('text_to_vtt.log', traceback.format_exc())
-                    print('Vtt done')
+                            #ASR
+                            text, log, *additional = workers.asr_worker(audio, segmentation, task.language)
+                            res_zip.writestr('transcript.txt', text)
+                            log_zip.writestr('transcribe_audio.log', log)
+                            print('ASR done')
 
-                    #MT
-                    if task.translations:
-                        for code, translation, log in workers.mt_worker(text, task.language, task.translations, source, segmentation, *additional):
-                            res_zip.writestr(f'translation_{code}.txt', translation)
-                            log_zip.writestr(f'translate_to_{code}.log', log)
-                    print('MT done')
+                            #ToVtt
+                            try:
+                                vtt, log = set_to_vtt(text, subtask)
+                                res_zip.writestr('transcript.vtt', vtt)
+                                log_zip.writestr('text_to_vtt.log', log)
 
-                except Exception:
-                    log_zip.writestr('error.log', traceback.format_exc())
+                                full_zip.writestr(f'{subtask.title}/transcript.vtt', vtt)
+                            except Exception:
+                                log_zip.writestr('text_to_vtt.log', traceback.format_exc())
+                            print('Vtt done')
+
+                            #MT
+                            if task.translations:
+                                for code, translation, log in workers.mt_worker(text, task.language, task.translations, source, segmentation, *additional):
+                                    res_zip.writestr(f'translation_{code}.txt', translation)
+                                    log_zip.writestr(f'translate_to_{code}.log', log)
+                            print('MT done')
+
+                        except Exception:
+                            log_zip.writestr('error.log', traceback.format_exc())
 
     task.status = task.DONE
     task.save()

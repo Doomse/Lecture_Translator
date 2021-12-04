@@ -25,10 +25,10 @@ class TaskListView(VerifiedMixin, generic.ListView):
         return models.Task.objects.filter(owner=self.request.user)
 
 
-class TaskZipCreateView(VerifiedMixin, generic.CreateView):
+class TaskCreateView(VerifiedMixin, generic.CreateView):
 
     model = models.Task
-    form_class = forms.TaskZipForm
+    form_class = forms.TaskFilesForm
 
     def get_success_url(self):
         return urls.reverse('task-translations', args=(self.object.id, ))
@@ -36,11 +36,6 @@ class TaskZipCreateView(VerifiedMixin, generic.CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
-
-
-class TaskFilesCreateView(TaskZipCreateView):
-
-    form_class = forms.TaskFilesForm
 
 
 class TaskTranslationView(VerifiedMixin, generic.UpdateView):
@@ -56,6 +51,7 @@ class TaskTranslationView(VerifiedMixin, generic.UpdateView):
         return super().form_valid(form)
 
 
+#TODO doesn't work due to task remodelling
 class TaskDownloadSourceView(VerifiedMixin, generic.DetailView):
 
     model = models.Task
@@ -68,6 +64,7 @@ class TaskDownloadSourceView(VerifiedMixin, generic.DetailView):
         return http.FileResponse(instance.source.open('rb'), as_attachment=True)
 
 
+#TODO doesn't work due to task remodelling
 class TaskDownloadResultView(VerifiedMixin, generic.DetailView):
 
     model = models.Task
@@ -80,6 +77,7 @@ class TaskDownloadResultView(VerifiedMixin, generic.DetailView):
         return http.FileResponse(instance.result.open('rb'), as_attachment=True)
 
 
+#TODO doesn't work due to task remodelling
 class TaskDownloadLogView(VerifiedMixin, generic.DetailView):
 
     model = models.Task
@@ -90,6 +88,18 @@ class TaskDownloadLogView(VerifiedMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         return http.FileResponse(instance.log.open('rb'), as_attachment=True)
+
+
+class TaskDownloadResourcesView(VerifiedMixin, generic.DetailView):
+
+    model = models.Task
+
+    def get_object(self, queryset=None):
+        return super().get_object(queryset=models.Task.objects.filter(owner=self.request.user))
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return http.FileResponse(instance.edit_resources.open('rb'), as_attachment=True)
 
 
 class TaskReturnView(VerifiedMixin, generic.FormView):
@@ -113,5 +123,6 @@ class TaskReturnView(VerifiedMixin, generic.FormView):
                 subtask.finished = True
                 # save again
                 subtask.save()
-                break  # only the first NOTE in the File should be considered
-        return super().form_valid(form)
+                return super().form_valid(form)  # only the first NOTE in the File should be considered
+        raise BadRequest("No task id provided in the file")
+        

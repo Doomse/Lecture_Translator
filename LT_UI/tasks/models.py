@@ -17,6 +17,9 @@ def result_path(instance, filename):
 def log_path(instance, filename):
     return instance.owner.username + f'/log_{instance.title}.zip'
 
+def edit_resource_path(instance, filename):
+    return f'{instance.owner.username}/{instance.title}/resources_{instance.title}.zip'
+
 
 class ListField(models.CharField):
     """
@@ -63,7 +66,12 @@ class Task(models.Model):
     translations = ListField(max_length=100, blank=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=4, default=CREATE)
 
+    #NOTE Collects the resources required for transcript correction, for simplified download
+    edit_resources = models.FileField(upload_to=edit_resource_path)
+
     def save(self, *args, **kwargs):
+        if self._state.adding:
+            self.edit_resources.save('name', base.ContentFile(b''), save=False)
         super().save(*args, **kwargs)
         if self.status == self.WAIT:
             t = threading.Thread(target=utils.run_workers, kwargs={'task': self})
@@ -106,5 +114,5 @@ class SubTask(models.Model):
         if self._state.adding:
             self.result.save('name', base.ContentFile(b''), save=False)
             self.log.save('name', base.ContentFile(b''), save=False)
-            self.correction.save('name', base.ContentFile(b''), save=False)
+            #self.correction.save('name', base.ContentFile(b''), save=False)
         super().save(*args, **kwargs)

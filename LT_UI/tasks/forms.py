@@ -6,20 +6,6 @@ from . import models
 import zipfile
 
 
-class TaskZipForm(forms.ModelForm):
-    
-    #translations = forms.MultipleChoiceField(choices=utils.LANGUAGE_CHOICES, widget=forms.widgets.CheckboxSelectMultiple)
-    source = forms.FileField()
-
-    class Meta:
-        model = models.Task
-        fields = ("title", "source", "language", )
-        widgets = {
-            'language': forms.RadioSelect,
-            'source': forms.FileInput(attrs={'accept': 'application/zip'}),
-        }
-
-
 class TaskFilesForm(forms.ModelForm):
 
     source = forms.FileField(widget=forms.FileInput(attrs={'multiple': True, 'accept': 'audio/*,video/*'}))
