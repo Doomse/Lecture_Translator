@@ -10,8 +10,7 @@ LANGUAGE_CHOICES = [
 ]
 """
 LANGUAGE_CHOICES = [
-    ('de', 'German'),
-    ('en', 'English'),
+
 ]
 
 
@@ -32,13 +31,7 @@ TRANSLATION_CHOICES = {
 }
 """
 TRANSLATION_CHOICES = {
-    'de': [
-        ('en', 'English'),
-    ],
-    'en': [
-        ('de', 'German'),
-        ('fr', 'French'),
-    ],
+
 }
 
 

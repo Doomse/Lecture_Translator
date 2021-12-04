@@ -1,6 +1,10 @@
 from django import http, urls
+from django.core.exceptions import BadRequest
+from django.core.files.base import ContentFile
+from django.http.response import HttpResponse
 from django.views import generic
 from django.contrib.auth import mixins
+
 from . import models, forms
 
 
@@ -86,3 +90,28 @@ class TaskDownloadLogView(VerifiedMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         return http.FileResponse(instance.log.open('rb'), as_attachment=True)
+
+
+class TaskReturnView(VerifiedMixin, generic.FormView):
+
+    template_name = 'tasks/task_return.html'
+    form_class = forms.TaskReturnForm
+    success_url = urls.reverse_lazy('task-list')
+
+    def form_valid(self, form) -> HttpResponse:
+        f = form.cleaned_data['cfile']
+        content = f.read()
+        for line in map(bytes.decode, content.splitlines()):
+            if line.startswith('NOTE'):
+                id = int(line.split()[1])  # [0] is 'NOTE'
+                if not models.SubTask.objects.filter(id=id).exists():
+                    raise BadRequest("Could not match correction to any task")
+                subtask = models.SubTask.objects.get(id=id)
+                # save the file
+                subtask.correction.save('correction.vtt', ContentFile(content))
+                # if this worked, mark as finished
+                subtask.finished = True
+                # save again
+                subtask.save()
+                break  # only the first NOTE in the File should be considered
+        return super().form_valid(form)

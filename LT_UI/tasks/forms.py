@@ -53,3 +53,8 @@ class TaskTranslationForm(forms.ModelForm):
     class Meta:
         model = models.Task
         fields = ("translations", )
+
+
+class TaskReturnForm(forms.Form):
+
+    cfile = forms.FileField(widget=forms.FileInput(attrs={'accept': 'text/vtt'}))

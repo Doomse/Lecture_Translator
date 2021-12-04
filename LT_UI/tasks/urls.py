@@ -9,4 +9,5 @@ urlpatterns = [
     path('download/<int:pk>/result/', views.TaskDownloadResultView.as_view(), name='task-download-result'),
     path('download/<int:pk>/log/', views.TaskDownloadLogView.as_view(), name='task-download-log'),
     path('translations/<int:pk>/', views.TaskTranslationView.as_view(), name='task-translations'),
+    path('return/', views.TaskReturnView.as_view(), name='task-return'),
 ]

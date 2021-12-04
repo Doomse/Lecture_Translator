@@ -55,8 +55,8 @@ def stm_to_vtt_time(time):
     time = time.time()
     return time.isoformat('milliseconds')
 
-def set_to_vtt(text):
-    result = "WEBVTT \n\n"
+def set_to_vtt(text, subtask):
+    result = f'WEBVTT \n\nNOTE {subtask.id}\n\n'
     log = ""
     for line in text.splitlines():
         line = line.strip()     
@@ -117,7 +117,7 @@ def run_workers(task):
 
                     #ToVtt
                     try:
-                        vtt, log = set_to_vtt(text)
+                        vtt, log = set_to_vtt(text, subtask)
                         res_zip.writestr('transcript.vtt', vtt)
                         log_zip.writestr('text_to_vtt.log', log)
                     except Exception:

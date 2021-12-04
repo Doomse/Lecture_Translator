@@ -89,13 +89,18 @@ def subtask_correction_path(instance, filename):
 
 class SubTask(models.Model):
 
-    title = models.CharField(max_length=200, unique=True)
+    title = models.CharField(max_length=200)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='subtask')
     source = models.FileField(upload_to=subtask_source_path)
     result = models.FileField(upload_to=subtask_result_path)
     log = models.FileField(upload_to=subtask_log_path)
     correction = models.FileField(upload_to=subtask_correction_path)
     finished = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['title', 'task'], name='unique_st'),
+        ]
 
     def save(self, *args, **kwargs):
         if self._state.adding:
