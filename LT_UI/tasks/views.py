@@ -4,6 +4,9 @@ from django.core.files.base import ContentFile
 from django.http.response import HttpResponse
 from django.views import generic
 from django.contrib.auth import mixins
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from . import models, forms
 
@@ -126,3 +129,26 @@ class TaskReturnView(VerifiedMixin, generic.FormView):
                 return super().form_valid(form)  # only the first NOTE in the File should be considered
         raise BadRequest("No task id provided in the file")
         
+
+class TaskReturnAPIView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        try:
+            f = request.FILES['cfile']
+        except KeyError:
+            raise BadRequest("Must submit cfile")
+        content = f.read()
+        for line in map(bytes.decode, content.splitlines()):
+            if line.startswith('NOTE'):
+                id = int(line.split()[1])
+                if not models.SubTask.objects.filter(id=id).exists():
+                    raise BadRequest("Could not match correction to any task")
+                subtask = models.SubTask.objects.get(id=id)
+                # save the file
+                subtask.correction.save('correction.vtt', ContentFile(content))
+                # if this worked, mark as finished
+                subtask.finished = True
+                # save again
+                subtask.save()
+                return Response(status=status.HTTP_200_OK)
+        raise BadRequest("No task id provided in the file")

@@ -14,4 +14,5 @@ urlpatterns = [
 
     path('translations/<int:pk>/', views.TaskTranslationView.as_view(), name='task-translations'),
     path('return/', views.TaskReturnView.as_view(), name='task-return'),
+    path('api/return/', views.TaskReturnAPIView.as_view(), name='task-return-api'),
 ]
