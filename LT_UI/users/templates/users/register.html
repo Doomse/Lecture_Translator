@@ -1,10 +1,22 @@
 {% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_headers %}
+    <link href="{% static 'users/styles.css' %}" rel=stylesheet>
+{% endblock extra_headers %}
+
 {% block content %}
     <div>
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="submit" value="Register">
+            <p>
+                <input type="submit" value="Register">
+            </p>
         </form>
     </div>
+    <p>
+        <a href="{% url 'login' %}" class="small">Login with existing account</a>
+    </p>
 {% endblock content %}

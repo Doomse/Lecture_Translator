@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block extra_headers %}
+    <link href="{% static 'users/styles.css' %}" rel=stylesheet>
+{% endblock extra_headers %}
+
 {% block content %}
     <div>
         <form method="POST">
@@ -9,6 +15,10 @@
                 <tr>
                     <th></th>
                     <td><input type="submit" value="Login"></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td><a href="{% url 'register' %}" class="small">Register new account</a></td>
                 </tr>
             </table>
         </form>

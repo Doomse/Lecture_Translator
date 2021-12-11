@@ -1,4 +1,6 @@
 from django import forms
+from django.utils import safestring
+from django.templatetags import static
 from datetime import datetime
 from . import models
 from django.contrib.auth.forms import UserCreationForm, UsernameField
@@ -18,7 +20,9 @@ class VerificationForm(forms.Form):
 
 class UserRegisterForm(UserCreationForm):
 
+    agreement = forms.BooleanField(help_text=safestring.mark_safe(f'I accept the this <a href="{static.static("users/agreement.pdf")}" target="_blank">agreement</a>') )
+
     class Meta:
         model = models.User
-        fields = ("username",)
+        fields = ("username", )
         field_classes = {'username': UsernameField}
