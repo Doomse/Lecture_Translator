@@ -95,7 +95,7 @@ def run_workers(task):
                             ext = Path(src_file.name).suffix
                             name = Path(src_file.name).stem
 
-                            full_zip.writestr(f'{subtask.title}/source{ext}', source)
+                            #full_zip.writestr(f'{subtask.title}/source{ext}', source)
 
                             #Convert
                             audio, log = convert_to_wav(source, ext)
@@ -118,6 +118,8 @@ def run_workers(task):
                             text, log, *additional = workers.asr_worker(audio, segmentation, task.language)
                             res_zip.writestr('transcript.txt', text)
                             log_zip.writestr('transcribe_audio.log', log)
+
+                            full_zip.writestr(f'{subtask.title}/transcript.txt', text)
                             print('ASR done')
 
                             #ToVtt
