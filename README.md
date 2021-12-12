@@ -6,6 +6,9 @@
 - ffmpeg for audio conversion
 - Java for Segmentation
 
+## Setup Pipeline
+Copy the workers_template.py file to workers.py (same directory) and fill it according to its comments
+
 ## Local Development Setup
 1. Clone the repository
 3. Create and activate a virtual environment and install packages with `pip install -r requirements.txt`
