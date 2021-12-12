@@ -119,7 +119,7 @@ def run_workers(task):
                             res_zip.writestr('transcript.txt', text)
                             log_zip.writestr('transcribe_audio.log', log)
 
-                            full_zip.writestr(f'{subtask.title}/transcript.txt', text)
+                            full_zip.writestr(f'{subtask.title}/{subtask.title}.txt', text)
                             print('ASR done')
 
                             #ToVtt
@@ -128,7 +128,7 @@ def run_workers(task):
                                 res_zip.writestr('transcript.vtt', vtt)
                                 log_zip.writestr('text_to_vtt.log', log)
 
-                                full_zip.writestr(f'{subtask.title}/transcript.vtt', vtt)
+                                full_zip.writestr(f'{subtask.title}/{subtask.title}.vtt', vtt)
                             except Exception:
                                 log_zip.writestr('text_to_vtt.log', traceback.format_exc())
                             print('Vtt done')
