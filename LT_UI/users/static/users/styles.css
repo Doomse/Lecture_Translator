@@ -1,3 +1,7 @@
 a.small {
     font-size: small;
 }
+
+.errorlist {
+    color: red;
+}
