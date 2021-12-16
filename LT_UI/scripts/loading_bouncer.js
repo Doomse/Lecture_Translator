@@ -1,6 +1,6 @@
 (function (win, doc) {
     'use strict';
-    if (!doc.getElementsByName || !win.addEventListener) {
+    if (!doc.getElementById || !win.addEventListener) {
         // doesn't cut the mustard.
         return;
     }

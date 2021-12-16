@@ -7,7 +7,9 @@
 {% endblock extra_headers %}
 
 {% block content %}
+
     <div id="logout">Currently logged in as {{ user.get_username }} <a href="{% url 'logout' %}"><button type="button">Logout</button></a></div>
+
     {# <a href="{% url 'task-create-zip' %}"><button type="button">From Zip Archive</button></a> #}
     <a href="{% url 'task-create' %}"><button type="button">Create Task</button></a>
     <a href="{% url 'task-return' %}"><button type="button">Submit Task</button></a>
@@ -15,14 +17,18 @@
     {% for task in task_list %}
         <p>
             <span>
+
                 {% if task.status == task.CREATE %}
                     <a href="{% url 'task-translations' task.id %}">{{ task.title }}</a>
                 {% else %}
                     {{ task.title }}
                 {% endif %}
+
                 <span class="{{ task.status|lower }}">{{ task.get_status_display }}</span>
+
             </span>
             <span class="download">
+
                 {% comment "Broken since task remodelling" %}
                     <a href="{% url 'task-download-source' task.id %}"><button type="button">Source</button></a>
                     {% if task.status == task.DONE %}
@@ -33,16 +39,22 @@
                         <button type="button" disabled>Log</button>
                     {% endif %}
                 {% endcomment %}
+
                 {% if task.status == task.DONE %}
                     <a href="{% url 'task-download-resources' task.id %}"><button type="button">Download Resources</button></a>
                 {% else %}
                     <button type="button" disabled>Download Resources</button>
                 {% endif %}
+
             </span>
         </p>
         <hr>
     {% endfor %}
+
     {# <a href="{% url 'task-create-zip' %}"><button type="button">From Zip Archive</button></a> #}
     <a href="{% url 'task-create' %}"><button type="button">Create Task</button></a>
     <a href="{% url 'task-return' %}"><button type="button">Submit Task</button></a>
+
+    <script src="{% static 'reload_page.js' %}"></script>
+
 {% endblock content %}
