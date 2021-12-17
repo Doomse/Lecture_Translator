@@ -66,6 +66,9 @@ class Task(models.Model):
     translations = ListField(max_length=100, blank=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=4, default=CREATE)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     #NOTE Collects the resources required for transcript correction, for simplified download
     edit_resources = models.FileField(upload_to=edit_resource_path)
 

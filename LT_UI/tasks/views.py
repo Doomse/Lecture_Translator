@@ -6,7 +6,7 @@ from django.views import generic
 from django.contrib.auth import mixins
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, decorators, permissions
 
 from . import models, forms
 
@@ -152,3 +152,10 @@ class TaskReturnAPIView(APIView):
                 subtask.save()
                 return Response(status=status.HTTP_200_OK)
         raise BadRequest("No task id provided in the file")
+
+
+@decorators.api_view()
+@decorators.permission_classes([permissions.IsAuthenticated])
+def get_last_update(request):
+    update = request.user.tasks.filter(status=models.Task.DONE).datetimes('updated_at', 'second', order='DESC')[0]
+    return Response(data=update, status=status.HTTP_200_OK)

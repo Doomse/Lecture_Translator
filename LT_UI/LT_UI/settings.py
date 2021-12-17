@@ -125,4 +125,11 @@ LOGIN_REDIRECT_URL = reverse_lazy('task-list')
 LOGOUT_REDIRECT_URL = LOGIN_URL
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
+
 from .localsettings import *
