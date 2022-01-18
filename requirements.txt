@@ -1,5 +1,6 @@
 asgiref==3.4.1
 Django==3.2.7
+https://github.com/django-cas-ng/django-cas-ng/archive/master.zip
 numpy==1.21.4
 pytz==2021.1
 sqlparse==0.4.1
